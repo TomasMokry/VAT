@@ -4,11 +4,11 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class StateDataSet {
-    private ArrayList<State> states = new ArrayList<>();
+public class StatesDataSet {
+    private final ArrayList<State> states = new ArrayList<>();
 
     public ArrayList<State> getStates(){
-        return new ArrayList<State>(states);
+        return new ArrayList<>(states);
     }
 
     public void readFromCsv(String filename, String delimetr) throws StateException {
@@ -20,7 +20,7 @@ public class StateDataSet {
             while (scanner.hasNextLine()){
                 line = scanner.nextLine();
                 lineCorrected = line.replace(",",".");
-                items = lineCorrected.split("\t");
+                items = lineCorrected.split(delimetr);
                 states.add(new State(items[0],
                         items[1],
                         Double.parseDouble(items[2]),
