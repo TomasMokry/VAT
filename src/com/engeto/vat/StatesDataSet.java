@@ -2,6 +2,7 @@ package com.engeto.vat;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.Scanner;
 
 public class StatesDataSet {
@@ -32,7 +33,7 @@ public class StatesDataSet {
         }
     }
     public void writeToTxtStatesVatOver20(String filename, String delimetr) throws StateException {
-        ArrayList<State> list = getStatesWithTaxOver20();
+        ArrayList<State> list = getStatesWithVatOver20();
         ArrayList<String> rows = new ArrayList<>();
 
         for (State state : list){
@@ -50,12 +51,19 @@ public class StatesDataSet {
         }
     }
 
-    public void filterAndPrintToTxt(String delimetr,int limit) throws StateException {
+    public void filterAndPrintToTxt(String delimetr,String limit) throws StateException {
 
         ArrayList<State> list = new ArrayList<>();
+
+        if (Objects.equals(limit, "")) {
+            limit = "20";
+        }
+
+        int limitInt = Integer.parseInt(limit);
         for (State state : states){
-            if (state.getRegularTax()> limit && !state.hasSpecialTax()){
-                list.add(state);}
+            if (state.getRegularTax() > limitInt && !state.hasSpecialTax()){
+                list.add(state);
+            }
         }
 
         ArrayList<String> rows = new ArrayList<>();
@@ -79,13 +87,13 @@ public class StatesDataSet {
         }
     }
 
-    public ArrayList<State> getStatesWithTaxOver20(){
-        ArrayList<State> statesWithTaxOver20 = new ArrayList<>();
+    public ArrayList<State> getStatesWithVatOver20(){
+        ArrayList<State> statesWithVatOver20 = new ArrayList<>();
         for (State state : states){
-            if (state.getRegularTax()>20 && !state.hasSpecialTax()){
-                statesWithTaxOver20.add(state);}
+            if (state.getRegularTax() > 20 && !state.hasSpecialTax()){
+                statesWithVatOver20.add(state);}
         }
-        return statesWithTaxOver20;
+        return statesWithVatOver20;
     }
 
 }
