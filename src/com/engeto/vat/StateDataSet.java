@@ -1,6 +1,7 @@
 package com.engeto.vat;
 
 public class StateDataSet {
+
     //TODO
     //Načti ze souboru všechna data do vhodné datové struktury (vytvoř třídu pro uložení dat).
     //Vypiš seznam všech států a u každého uveď základní sazbu daně z přidané hodnoty ve formátu podle vzoru:
