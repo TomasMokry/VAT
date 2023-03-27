@@ -1,2 +1,4 @@
-package com.engeto.vat;public class Settings {
+package com.engeto.vat;
+
+public class Settings {
 }

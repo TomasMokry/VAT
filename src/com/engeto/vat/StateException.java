@@ -1,2 +1,4 @@
-package com.engeto.vat;public class StateException {
+package com.engeto.vat;
+
+public class StateException {
 }
