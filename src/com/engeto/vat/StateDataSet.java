@@ -1,17 +1,91 @@
 package com.engeto.vat;
 
-public class StateDataSet {
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Scanner;
 
-    //TODO
-    //Načti ze souboru všechna data do vhodné datové struktury (vytvoř třídu pro uložení dat).
-    //Vypiš seznam všech států a u každého uveď základní sazbu daně z přidané hodnoty ve formátu podle vzoru:
-    //Název země (zkratka): základní sazba %
-    //Vypiš ve stejném formátu pouze státy, které mají základní sazbu daně z přidané hodnoty vyšší než 20 % a přitom nepoužívají speciální sazbu daně.
-    //Výpis z bodu 3. seřaď podle výše základní sazby DPH/VAT sestupně (nejprve státy s nejvyšší sazbou).
-    //Pod výpis z bodu 3. doplň řádek s rovnítky pro oddělení a poté seznam zkratek států, které ve výpisu nefigurují. Opět dodrž formát podle vzoru (místo tří teček budou další státy):
-    //Výsledný výpis zapiš také do souboru s názvem vat-over-20.txt. Výstupní soubor ulož do stejné složky, ve které byl vstupní soubor. (Výpis na obrazovku zůstává.)
-    //Doplň možnost, aby uživatel z klávesnice zadal výši sazby DPH/VAT, podle které se má filtrovat. Vypíší se tedy státy se základní sazbou vyšší než ta, kterou uživatel zadal.
-    //Pokud uživatel zmáčkne pouze Enter, jako výchozí hodnota se použij jako výchozí sazbu 20 %.
-    //Uprav název výstupního souboru tak, aby reflektoval zadanou sazbu daně. Například pro zadanou sazbu 17 % se vygeneruje soubor vat-over-17.txt a pro sazbu 25 % se vygeneruje soubor vat-over-25.txt.
+public class StateDataSet {
+    private ArrayList<State> states = new ArrayList<>();
+
+    public ArrayList<State> getStates(){
+        return new ArrayList<State>(states);
+    }
+
+    public void readFromCsv(String filename, String delimetr) throws StateException {
+        try (Scanner scanner = new Scanner(new File(filename))){
+            String line;
+            String lineCorrected;
+            String[] items;
+
+            while (scanner.hasNextLine()){
+                line = scanner.nextLine();
+                lineCorrected = line.replace(",",".");
+                items = lineCorrected.split("\t");
+                states.add(new State(items[0],
+                        items[1],
+                        Double.parseDouble(items[2]),
+                        Double.parseDouble(items[3]),
+                        Boolean.parseBoolean(items[4])));
+            }
+        } catch (FileNotFoundException e){
+            throw new StateException("File "+ filename +"was not found.\n" + e.getLocalizedMessage());
+        }
+    }
+    public void writeToTxtStatesVatOver20(String filename, String delimetr) throws StateException {
+        ArrayList<State> list = getStatesWithTaxOver20();
+        ArrayList<String> rows = new ArrayList<>();
+
+        for (State state : list){
+            rows.add(state.getStateID()
+                    +delimetr+state.getStateName()
+                    +delimetr+state.getRegularTax()
+                    +delimetr+state.getReducedTax()
+                    +delimetr+state.hasSpecialTax());
+        }
+
+        try (PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(filename)))){
+            for(String row : rows){writer.println(row);}
+        } catch (IOException e){
+            throw new StateException("There is a problem with file" + e.getLocalizedMessage());
+        }
+    }
+
+    public void filterAndPrintToTxt(String delimetr,int limit) throws StateException {
+
+        ArrayList<State> list = new ArrayList<>();
+        for (State state : states){
+            if (state.getRegularTax()> limit && !state.hasSpecialTax()){
+                list.add(state);}
+        }
+
+        ArrayList<String> rows = new ArrayList<>();
+
+        for (State state : list){
+            rows.add(state.getStateID()
+                    +delimetr+state.getStateName()
+                    +delimetr+state.getRegularTax()
+                    +delimetr+state.getReducedTax()
+                    +delimetr+state.hasSpecialTax());
+
+        }
+        String filename = "vat-over-";
+        filename = filename+limit+".txt";
+
+        try (PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(filename)))){
+            for(String row : rows){writer.println(row);}
+
+        } catch (Exception e){
+            throw new StateException("There is a problem with file" + e.getLocalizedMessage());
+        }
+    }
+
+    public ArrayList<State> getStatesWithTaxOver20(){
+        ArrayList<State> statesWithTaxOver20 = new ArrayList<>();
+        for (State state : states){
+            if (state.getRegularTax()>20 && !state.hasSpecialTax()){
+                statesWithTaxOver20.add(state);}
+        }
+        return statesWithTaxOver20;
+    }
 
 }

@@ -47,7 +47,7 @@ public class State {
         this.reducedTax = reducedTax;
     }
 
-    public boolean isHasSpecialTax() {
+    public boolean hasSpecialTax() {
         return hasSpecialTax;
     }
 
