@@ -1,4 +1,7 @@
 package com.engeto.vat;
 
-public class StateException {
+public class StateException extends Exception {
+    public StateException(String message){
+        super(message);
+    }
 }
