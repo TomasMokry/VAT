@@ -24,45 +24,32 @@ public class Main {
         states.getStates().forEach(System.out::println);
         System.out.println("_____\n");
 
-        // print states with VAT over 20% and not using the special tax
-        System.out.println("All states with VAT over 20% and not using special tax: ");
-        states.getStatesWithVatOver20().forEach(System.out::println);
+        // sort states with the specific limit
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Please enter the VAT limit to sort the sates: (Default is 20)");
+        String input = scanner.nextLine();
+        states.sortStatesWithLimit(input);
+
+        // print states with VAT over "input" and not using the special tax
+        System.out.println("All states with VAT over " + input + "% and not using special tax: ");
+        states.getStatesOverLimit().forEach(System.out::println);
         System.out.println("_____\n");
 
         // sort the states above by VAT, descends
         System.out.println("States above sorted by VAT, descends:");
-        ArrayList<State> statesSorted = states.getStatesWithVatOver20();
+        ArrayList<State> statesSorted = states.getStatesOverLimit();
         statesSorted.sort(Comparator.comparing(State::getRegularTax).reversed());
         statesSorted.forEach(System.out::println);
         System.out.println("====================");
 
         // states with VAT 20% and lower or states using special tax
-        System.out.print("States with VAT 20% or lower or using special tax: ");
-        for (State state : states.getStates()){
-            if(state.getRegularTax()<= 20 || state.hasSpecialTax()){
-                System.out.print(state.getStateID()+", ");
-            }
-        }
+        System.out.print("States with VAT " + input + "% or lower or using special tax: ");
+        states.getStatesBelowLimit().forEach(item -> System.out.print(item.getStateID()+", "));
 
-        // print list of states with VAT over 20 into txt
-        try{states.writeToTxtStatesVatOver20(Settings.getFilenameOut(),Settings.getDelimetr());}
+        // print list of states with VAT over "input" into txt
+        try{states.writeToTxt(Settings.getFilenameOut(),Settings.getDelimetr());}
         catch (StateException e){
             System.err.println(e.getLocalizedMessage());
         }
-
-        // take input from user
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("\nEnter the limit for the VAT to filter states: ");
-        String input = scanner.nextLine();
-        try{states.filterAndPrintToTxt(Settings.getDelimetr(),input);}
-        catch (StateException e){
-            System.err.println(e.getLocalizedMessage());
-        }
-
-
-
-
-
-
     }
 }
