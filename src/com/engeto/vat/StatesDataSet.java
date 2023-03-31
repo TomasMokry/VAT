@@ -1,5 +1,7 @@
 package com.engeto.vat;
 
+import sun.swing.SwingUtilities2;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Objects;
@@ -7,11 +9,24 @@ import java.util.Scanner;
 
 public class StatesDataSet {
     private final ArrayList<State> states = new ArrayList<>();
+    private ArrayList<State> statesOverLimit = new ArrayList<>();
+    private ArrayList<State> statesBelowLimit = new ArrayList<>();
 
+    //region Getters
     public ArrayList<State> getStates(){
         return new ArrayList<>(states);
     }
 
+    public ArrayList<State> getStatesOverLimit() {
+        return statesOverLimit;
+    }
+
+    public ArrayList<State> getStatesBelowLimit() {
+        return statesBelowLimit;
+    }
+    //endregion
+
+    //region Read and write from / to files
     public void readFromCsv(String filename, String delimetr) throws StateException {
         try (Scanner scanner = new Scanner(new File(filename))){
             String line;
@@ -32,8 +47,8 @@ public class StatesDataSet {
             throw new StateException("File "+ filename +"was not found.\n" + e.getLocalizedMessage());
         }
     }
-    public void writeToTxtStatesVatOver20(String filename, String delimetr) throws StateException {
-        ArrayList<State> list = getStatesWithVatOver20();
+    public void writeToTxt(String filename, String delimetr) throws StateException {
+        ArrayList<State> list = getStatesOverLimit();
         ArrayList<String> rows = new ArrayList<>();
 
         for (State state : list){
@@ -50,50 +65,22 @@ public class StatesDataSet {
             throw new StateException("There is a problem with file" + e.getLocalizedMessage());
         }
     }
+    //endregion
 
-    public void filterAndPrintToTxt(String delimetr,String limit) throws StateException {
-
-        ArrayList<State> list = new ArrayList<>();
+    public void sortStatesWithLimit(String limit){
 
         if (Objects.equals(limit, "")) {
             limit = "20";
         }
 
         int limitInt = Integer.parseInt(limit);
+
         for (State state : states){
-            if (state.getRegularTax() > limitInt && !state.hasSpecialTax()){
-                list.add(state);
+            if (state.getRegularTax() > limitInt && ! state.hasSpecialTax()){
+                statesOverLimit.add(state);
+            } else {
+                statesBelowLimit.add(state);
             }
         }
-
-        ArrayList<String> rows = new ArrayList<>();
-
-        for (State state : list){
-            rows.add(state.getStateID()
-                    +delimetr+state.getStateName()
-                    +delimetr+state.getRegularTax()
-                    +delimetr+state.getReducedTax()
-                    +delimetr+state.hasSpecialTax());
-
-        }
-        String filename = "vat-over-";
-        filename = filename+limit+".txt";
-
-        try (PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(filename)))){
-            for(String row : rows){writer.println(row);}
-
-        } catch (Exception e){
-            throw new StateException("There is a problem with file" + e.getLocalizedMessage());
-        }
     }
-
-    public ArrayList<State> getStatesWithVatOver20(){
-        ArrayList<State> statesWithVatOver20 = new ArrayList<>();
-        for (State state : states){
-            if (state.getRegularTax() > 20 && !state.hasSpecialTax()){
-                statesWithVatOver20.add(state);}
-        }
-        return statesWithVatOver20;
-    }
-
 }
