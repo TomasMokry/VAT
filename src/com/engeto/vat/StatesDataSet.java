@@ -1,16 +1,13 @@
 package com.engeto.vat;
 
-import sun.swing.SwingUtilities2;
-
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Objects;
 import java.util.Scanner;
 
 public class StatesDataSet {
     private final ArrayList<State> states = new ArrayList<>();
-    private ArrayList<State> statesOverLimit = new ArrayList<>();
-    private ArrayList<State> statesBelowLimit = new ArrayList<>();
+    private final ArrayList<State> statesOverLimit = new ArrayList<>();
+    private final ArrayList<State> statesBelowLimit = new ArrayList<>();
 
     //region Getters
     public ArrayList<State> getStates(){
@@ -28,12 +25,15 @@ public class StatesDataSet {
 
     //region Read and write from / to files
     public void readFromCsv(String filename, String delimetr) throws StateException {
+        String line;
+        int lineNumber = 0;
+        String lineCorrected;
+        String[] items;
+
         try (Scanner scanner = new Scanner(new File(filename))){
-            String line;
-            String lineCorrected;
-            String[] items;
 
             while (scanner.hasNextLine()){
+                lineNumber++;
                 line = scanner.nextLine();
                 lineCorrected = line.replace(",",".");
                 items = lineCorrected.split(delimetr);
@@ -45,6 +45,9 @@ public class StatesDataSet {
             }
         } catch (FileNotFoundException e){
             throw new StateException("File "+ filename +"was not found.\n" + e.getLocalizedMessage());
+        } catch (NumberFormatException e){
+            throw  new StateException("There is a wrong number format. Please check this row: "
+            + lineNumber + " in file: " + filename +"\n"+e.getLocalizedMessage());
         }
     }
     public void writeToTxt(String filename, String delimetr) throws StateException {
@@ -67,16 +70,10 @@ public class StatesDataSet {
     }
     //endregion
 
-    public void sortStatesWithLimit(String limit){
-
-        if (Objects.equals(limit, "")) {
-            limit = "20";
-        }
-
-        int limitInt = Integer.parseInt(limit);
+    public void sortStatesWithLimit(int limit){
 
         for (State state : states){
-            if (state.getRegularTax() > limitInt && ! state.hasSpecialTax()){
+            if (state.getRegularTax() > limit && ! state.hasSpecialTax()){
                 statesOverLimit.add(state);
             } else {
                 statesBelowLimit.add(state);

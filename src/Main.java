@@ -5,6 +5,7 @@ import com.engeto.vat.StatesDataSet;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Objects;
 import java.util.Scanner;
 
 public class Main {
@@ -28,10 +29,14 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Please enter the VAT limit to sort the sates: (Default is 20)");
         String input = scanner.nextLine();
-        states.sortStatesWithLimit(input);
+        if (Objects.equals(input, "")) {
+            input = "20";
+        }
+        int inputInt = Integer.parseInt(input);
+        states.sortStatesWithLimit(inputInt);
 
         // print states with VAT over "input" and not using the special tax
-        System.out.println("All states with VAT over " + input + "% and not using special tax: ");
+        System.out.println("All states with VAT over " + inputInt + "% and not using special tax: ");
         states.getStatesOverLimit().forEach(System.out::println);
         System.out.println("_____\n");
 
@@ -43,7 +48,7 @@ public class Main {
         System.out.println("====================");
 
         // states with VAT 20% and lower or states using special tax
-        System.out.print("States with VAT " + input + "% or lower or using special tax: ");
+        System.out.print("States with VAT " + inputInt + "% or lower or using special tax: ");
         states.getStatesBelowLimit().forEach(item -> System.out.print(item.getStateID()+", "));
 
         // print list of states with VAT over "input" into txt
